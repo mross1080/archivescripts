@@ -1,28 +1,37 @@
 from docx import Document
 from docx.shared import Pt
 from docx.enum.style import WD_STYLE_TYPE
-doc = Document("../archive_data/translations_matt.docx")
+doc = Document("../archive_data/translationsen.docx")
 
 testimonies = {
     "Living on an island": {"question": "Would you go back to living on an island without a border and why?",
                             "id" : "living_on_an_island",
                             "data": []},
     "Columbus": {"question": "What did you learn about Columbus in school that you consider to be true history?",
+                  "id" : "columbus",
                  "data": []},
     "Our Lady of Mercedes": {"question": "Why do you think that the Virgin Mercedes protected the Spaniards and not the Indigenous people in the battle of El Santo Cerro in 1495?",
-         "data": []},
+                             "id": "our_lady_of_mercedes",
+                             "data": []},
     "Enslaved People": {"question": "What do you know about enslaved Black people in the Dominican Republic?",
-         "data": []},
+                        "id": "enslaved_people",
+                        "data": []},
     "Plantains": {"question": "Do you eat plantains? Did you know that mangú is a food popularized by enslaved Black people in the Dominican Republic?",
-         "data": []},
+                  "id": "plantains",
+                  "data": []},
+
     "Salsa, Merengue, Bachata": {"question": "When and where do you dance to music with African influences; Salsa, Merengue, Bachata?",
-         "data": []},
+                                 "id": "salsa_merengue_bachata",
+                                 "data": []},
     "ID Card": {"question": "On your old identification, were you referred to as an Indio? Why?",
-         "data": []},
+                "id": "id_card",
+                "data": []},
     "V Century": {"question": "Why do you think the celebration of the V Centenary was important for the government and businessmen of the Dominican Republic?",
-         "data": []},
+                  "id": "v_century",
+                  "data": []},
     "Peña Gómez": {"question": "Do you think Peña Gómez had the right to be president, and why?",
-         "data": []},
+                   "id": "pena_gomez",
+                   "data": []},
 
 }
 
@@ -72,15 +81,16 @@ def format_cell_to_archive_dict(cell_text):
     return archive_for_testimony
 
 def extract_english_translations():
-    current_category = ""
+    print("STARTING ENGLISH TRANSLATIONS")
+    current_category = "Living on an island"
     final_archive = []
     for question in testimonies:
         formatted_questions.append(question)
     
-    doc = Document("../archive_data/translations_short1.docx")
+    doc = Document("../archive_data/translationsen.docx")
     # print(formatted_questions)
     for row in doc.tables[0].rows:
-        text = row.cells[0].text.strip()
+        text = row.cells[1].text.strip()
         # print(text)
         # print("QUES" )
         if "QUES" in text:
@@ -88,10 +98,13 @@ def extract_english_translations():
             # We have the named question so start with the new entry
             print(text)
         if "CATEGORY" in text:
+            print("Parsed {} Testimonies For Category {}".format(len(testimonies[current_category]["data"]),current_category))
             current_category = text.split("CATEGORY: ")[1]
             print("Currently aggregating testimonies for ", current_category)
+            testimonies[current_category]["name"] = current_category
         if "Testimony " in text:
             # print(text.split("\n")[0])
+
             testimonies[current_category]["data"].append(format_cell_to_archive_dict(text))
 
         # print(text.split("\n"))
@@ -99,7 +112,7 @@ def extract_english_translations():
     # print(testimonies)
     for archive in testimonies:
         final_archive.append(testimonies[archive])
-    print(final_archive)
+    # print(final_archive)
     return final_archive
 
 

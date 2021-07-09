@@ -1,7 +1,7 @@
 import os
 import json
 import unidecode
-
+from archive_scripts.extract_data_from_translation import extract_english_translations
 import shutil
 
 dirs = ["chatdata"]
@@ -23,10 +23,10 @@ def strip_sentence(line):
     split = line.split(". -")
     split_variation_2 = line.split(": ")
     if len(split_variation_2) == 2:
-        print(line)
+        # print(line)
         msg_body = split_variation_2[1]
     elif len(split) == 2:
-        print(line)
+        # print(line)
         msg_body = split[1]
     else:
         msg_body = line
@@ -51,7 +51,7 @@ def extract_content_from_archive(current_file):
                 if "Los mensajes y las llamadas" not in line:
                     strip_line = line.strip()
                     if "Toca para más información" in line:
-                        print(line)
+                        pass
                     if "I.I.R.D:" in line:
                         msg_sender = "admin"
                     else:
@@ -69,17 +69,13 @@ def extract_content_from_archive(current_file):
                             msg_body = line
                     else:
                         if "Toca para más información" in line:
-                            print(line)
+                            pass
                         elif msg_sender == "participant" and "https://" in line:
                             msg_body = line.split(": ")[1]
                         elif msg_sender == "admin" and "https://" in line:
-                            print("LINEEEEE",line)
                             msg_body = line.split(": ")[1].replace("\n","")
-                            print(msg_body)
                         elif line.__contains__("20, "):
-                            print("GOT A WEIRD FORMATTEDDDDD",line)
                             msg_body = line.split(":")[3]
-                            print("Formatted:", msg_body)
                         else:
                             msg_body = line.split(":")[2]
 
@@ -170,7 +166,7 @@ def create_archive():
                     count += 1
                     if ".txt" in f and f.strip(" ") not in files_to_skip and f not in processed_files:
                         current_file = '{}/{}'.format(file_path, f)
-                        print("CURRENT FILE NAME", f)
+                        # print("CURRENT FILE NAME", f)
                         cleansed_archive = extract_content_from_archive(current_file)
                         # json_archive[archive_category_name].append(cleansed_archive)
                         found_testimonies.append(cleansed_archive)
@@ -214,6 +210,7 @@ def create_archive():
     print("found {} files ".format(count))
 
     extracted_archive["es"] = json_archive
+    extracted_archive["en"] = extract_english_translations()
     with open('archive.json', 'w') as outfile:
         json.dump(extracted_archive, outfile)
     return extracted_archive
